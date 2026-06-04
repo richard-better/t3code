@@ -65,8 +65,11 @@ Every row is an upstream file we touched. Keep this current.
 - **Change:** in `runServerCommand`, wrap the incoming flags with
   `withPersonHomeFlags(...)` (from `../person/personServerConfig.ts`) before
   calling `resolveServerConfig`. When `T3PERSON_HOME` is set this forces
-  `baseDir` + `cwd` flags to the person repo; when unset it returns the flags
-  unchanged.
+  `baseDir` + `cwd` flags to the person repo and forces
+  `autoBootstrapProjectFromCwd` on (so the repo auto-mounts as the single
+  project — the `Add project` button is hidden in single-instance mode, so
+  this is the only path that creates it; idempotent on subsequent boots). When
+  unset it returns the flags unchanged.
 - **Why:** this is the single in-process point where `ServerConfig` is built for
   both the standalone server and the desktop-spawned backend.
 - **Re-apply if upstream moves it:** find wherever `resolveServerConfig(flags,
