@@ -2,6 +2,8 @@ import * as Effect from "effect/Effect";
 import { Command, GlobalFlag } from "effect/unstable/cli";
 
 import { ServerConfig, type StartupPresentation } from "../config.ts";
+// Overlay seam — see /RICHARD_PATCHES.md (Seam 1).
+import { withPersonHomeFlags } from "../person/personServerConfig.ts";
 import { runServer } from "../server.ts";
 import { type CliServerFlags, resolveServerConfig, sharedServerCommandFlags } from "./config.ts";
 
@@ -14,7 +16,7 @@ export const runServerCommand = (
 ) =>
   Effect.gen(function* () {
     const logLevel = yield* GlobalFlag.LogLevel;
-    const config = yield* resolveServerConfig(flags, logLevel, options);
+    const config = yield* resolveServerConfig(withPersonHomeFlags(flags), logLevel, options);
     return yield* runServer.pipe(Effect.provideService(ServerConfig, config));
   });
 
