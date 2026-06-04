@@ -118,11 +118,18 @@ Every row is an upstream file we touched. Keep this current.
   sidebar, which we still want for the single project's threads).
 - **Overlay used:** `apps/web/src/person/singleInstance.ts` →
   `useSingleInstance()` (reads `serverConfig.singleInstance`; false when absent).
-- **Change:** in `SidebarProjectsContent`, gate the "Add project" affordance
-  (the `data-testid="sidebar-add-project-trigger"` button in the "Projects"
-  group header) on `!singleInstance`. The button is left in place; it is simply
-  not rendered (disable by not wiring).
-- **Why:** single-instance = one repo; adding/selecting another project is
-  meaningless.
-- **Re-apply if upstream moves it:** gate the add/select-project control on
-  `useSingleInstance()` wherever the project chooser is rendered.
+- **Change:** in `SidebarProjectsContent`, when `singleInstance`:
+  - hide the "Add project" affordance (`data-testid="sidebar-add-project-trigger"`);
+  - relabel the group header "Projects" → "Threads" (and the empty state);
+  - pass `flatten={singleInstance}` to the project rows. A new `flatten` prop on
+    `SidebarProjectItem`/`SidebarProjectThreadList` drops the collapsible
+    project-header row (`group/project-header`), force-expands the project, and
+    removes the `SidebarMenuSub` nesting guide line (`border-l-0`) so the single
+    project's threads render flat under the "Threads" header.
+    All upstream pieces are left in place; they are simply not rendered (disable by
+    not wiring). The `ui/sidebar` `SidebarMenuSub` primitive is untouched — the
+    border is overridden via the instance `className`.
+- **Why:** single-instance = one repo; the project level is redundant chrome and
+  adding/selecting another project is meaningless.
+- **Re-apply if upstream moves it:** re-add the `flatten` prop + `useSingleInstance()`
+  gating wherever the project rows / thread list are rendered.
