@@ -43,6 +43,11 @@ import * as DesktopSshPasswordPrompts from "./ssh/DesktopSshPasswordPrompts.ts";
 import * as DesktopState from "./app/DesktopState.ts";
 import * as DesktopUpdates from "./updates/DesktopUpdates.ts";
 import * as DesktopWindow from "./window/DesktopWindow.ts";
+// Overlay seam — see /RICHARD_PATCHES.md (Seam 2). Must run before any layer
+// reads DesktopConfig/DesktopEnvironment.
+import { applyPersonHomeToProcessEnv } from "./person/personEnv.ts";
+
+applyPersonHomeToProcessEnv();
 
 const desktopEnvironmentLayer = Layer.unwrap(
   Effect.gen(function* () {
