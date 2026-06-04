@@ -405,6 +405,10 @@ export const ServerConfig = Schema.Struct({
   availableEditors: Schema.Array(EditorId),
   observability: ServerObservability,
   settings: ServerSettings,
+  // Overlay seam — see /RICHARD_PATCHES.md (Seam 3a). True when the server is
+  // bound to a single repo ("a person"); the web app hides multi-project UI.
+  // Optional for version-skew safety (absent → treat as false).
+  singleInstance: Schema.optional(Schema.Boolean),
 });
 export type ServerConfig = typeof ServerConfig.Type;
 

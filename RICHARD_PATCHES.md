@@ -44,7 +44,7 @@ Verified architecture (do not re-derive):
   overlay needs **no edit to `config.ts`**.
 - `cwd` is the provider session working directory; defaults to `process.cwd()`.
 - The desktop backend child inherits `process.env` (the env field in
-  `DesktopBackendConfiguration` is a *patch* that only unsets specific keys), so
+  `DesktopBackendConfiguration` is a _patch_ that only unsets specific keys), so
   `T3PERSON_HOME` set in the Electron process **propagates** to the server
   child. That means the server seam (`cli/server.ts`) re-roots both the
   standalone server and the desktop-spawned backend.
@@ -70,7 +70,7 @@ Every row is an upstream file we touched. Keep this current.
 - **Why:** this is the single in-process point where `ServerConfig` is built for
   both the standalone server and the desktop-spawned backend.
 - **Re-apply if upstream moves it:** find wherever `resolveServerConfig(flags,
-  ...)` is invoked and wrap `flags` with `withPersonHomeFlags`. If
+...)` is invoked and wrap `flags` with `withPersonHomeFlags`. If
   `resolveServerConfig`'s flag shape changes, update `withPersonHomeFlags` to
   match `CliServerFlags`.
 
@@ -110,11 +110,16 @@ Every row is an upstream file we touched. Keep this current.
 
 ### Seam 3c — hide the multi-project selector
 
-- **File:** `apps/web/src/routes/__root.tsx` (and/or
-  `apps/web/src/components/AppSidebarLayout.tsx`)
-- **Change:** when `serverConfig.singleInstance` is true, do not mount the
-  cross-project selector UI. The component is left in place (disable by not
-  wiring).
-- **Why:** single-instance = one repo; project switching is meaningless.
-- **Re-apply if upstream moves it:** gate the selector mount on the
-  `singleInstance` flag wherever the sidebar/project chooser is mounted.
+- **File:** `apps/web/src/components/Sidebar.tsx` (the project chooser lives deep
+  in the sidebar, not in `__root.tsx`/`AppSidebarLayout` — those mount the whole
+  sidebar, which we still want for the single project's threads).
+- **Overlay used:** `apps/web/src/person/singleInstance.ts` →
+  `useSingleInstance()` (reads `serverConfig.singleInstance`; false when absent).
+- **Change:** in `SidebarProjectsContent`, gate the "Add project" affordance
+  (the `data-testid="sidebar-add-project-trigger"` button in the "Projects"
+  group header) on `!singleInstance`. The button is left in place; it is simply
+  not rendered (disable by not wiring).
+- **Why:** single-instance = one repo; adding/selecting another project is
+  meaningless.
+- **Re-apply if upstream moves it:** gate the add/select-project control on
+  `useSingleInstance()` wherever the project chooser is rendered.
